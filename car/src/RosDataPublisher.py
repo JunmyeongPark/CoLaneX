@@ -10,10 +10,6 @@ class RosDataPublisher():
         self.publisher = rospy.Publisher(kwargs['publish_node'], Pose, queue_size=1)
         self.pose = Pose()
         self.gps_reader = GPSReader(ros_subscribe_path = kwargs['ros_subscribe_path'])
-        self.odometry_reader = OdometryReader(dbc_file_path = kwargs['dbc_file_path'],
-                                              arbitration_id = kwargs['arbitration_id'],
-                                              wheel_vel_rr = kwargs['wheel_vel_rr'],
-                                              wheel_vel_rl = kwargs['wheel_vel_rl'])
         self.latitude = 0
         self.longitude = 0
         self.yaw = 0
@@ -23,19 +19,24 @@ class RosDataPublisher():
         self.dummy3 = kwargs['dummy3']
 
         self.velocity_source = kwargs['velocity_source']
+        if self.velocity_source == 'Odometry':
+            self.odometry_reader = OdometryReader(dbc_file_path = kwargs['dbc_file_path'],
+                                                arbitration_id = kwargs['arbitration_id'],
+                                                wheel_vel_rr = kwargs['wheel_vel_rr'],
+                                                wheel_vel_rl = kwargs['wheel_vel_rl'])
 
     def data_read(self) -> None:
-
-        self.odometry_reader.read_odom()
+        
         
         self.latitude = self.gps_reader.get_gps()[0]
         self.longitude = self.gps_reader.get_gps()[1]
         self.yaw = self.gps_reader.get_gps()[2]
-        
         if self.velocity_source == 'Odometry':
-            self.velocity = self.odometry_reader.get_vel() ## here
+            self.odometry_reader.read_odom()
+            velocity = self.odometry_reader.get_vel()
         if self.velocity_source == 'GPS':
-            self.velocity = self.gps_reader.get_vel()
+            velocity = self.gps_reader.get_vel()
+        self.velocity = velocity
 
     def data_compose(self) -> None:
 
