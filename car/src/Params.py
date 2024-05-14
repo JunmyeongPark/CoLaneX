@@ -7,7 +7,8 @@ ioniq = {'dbc_file_path' : 'can.dbc',
          'publish_node' : '/car/hlv_pose',
          'dummy1' : 0,
          'dummy2' : 0,
-         'dummy3' : 0
+         'dummy3' : 0,
+         'velocity_source' : 'Odometry'
          }
         
 i30 = {'dbc_file_path' : 'hyundai_2015_ccan.dbc',
@@ -19,5 +20,6 @@ i30 = {'dbc_file_path' : 'hyundai_2015_ccan.dbc',
        'publish_node' : '/car/tlv_pose',
        'dummy1' : 0,
        'dummy2' : 0,
-       'dummy3' : 0
+       'dummy3' : 0,
+       'velocity_source' : 'GPS'
        }

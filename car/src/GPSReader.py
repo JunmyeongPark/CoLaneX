@@ -10,15 +10,16 @@ class GPSReader:
         
         if (ros_subscribe_path == '/novatel/oem7/inspva'):
             rospy.Subscriber(ros_subscribe_path, INSPVA, self.novatel_callback)
-        elif (ros_subscribe_path == '/vectornav/GPS'):
-            rospy.Subscriber(ros_subscribe_path, NavSatFix, self.vectornav_gps_callback)
-            rospy.Subscriber('/vectornav/IMU', Imu, self.vectornav_imu_callback)
+        # elif (ros_subscribe_path == '/vectornav/GPS'):
+        #     rospy.Subscriber(ros_subscribe_path, NavSatFix, self.vectornav_gps_callback)
+        #     rospy.Subscriber('/vectornav/IMU', Imu, self.vectornav_imu_callback)
         else:
             print("===== ROS subscribe path is wrong =====")
     
         self.latitude = 0
         self.longitude = 0
         self.yaw = 0
+        self.GPSvelocity = 0
 
     def novatel_callback(self, msg) -> None:
         self.latitude = msg.latitude
@@ -27,10 +28,14 @@ class GPSReader:
         # 89        : for IONIQ antenna bias
         # -azimuth  : for ccw
         self.yaw = 89 - msg.azimuth
+
+        north_velociy = msg.north_velocity
+        east_velociy = msg.east_velocity
+        self.GPSvelocity = (north_velociy**2 + east_velociy**2)**0.5
     
-    def vectornav_gps_callback(self, msg) -> None:
-        self.latitude = msg.latitude
-        self.longitude = msg.longitude
+    # def vectornav_gps_callback(self, msg) -> None:
+    #     self.latitude = msg.latitude
+    #     self.longitude = msg.longitude
 
     def vectornav_imu_callback(self, msg) -> None:
         self.yaw = self.quaternion_to_euler_yaw_to_deg(msg.orientation.x,
@@ -43,6 +48,10 @@ class GPSReader:
         carGPS = [self.latitude, self.longitude, self.yaw]
 
         return carGPS
+    
+    # return : [m/s]
+    def get_vel(self):
+        return self.GPSvelocity
     
     def quaternion_to_euler_yaw_to_deg(self, x, y, z, w) -> float:
         a = 2.0 * (w * z + x * y)

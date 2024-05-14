@@ -22,6 +22,8 @@ class RosDataPublisher():
         self.dummy2 = kwargs['dummy2']
         self.dummy3 = kwargs['dummy3']
 
+        self.velocity_source = kwargs['velocity_source']
+
     def data_read(self) -> None:
 
         self.odometry_reader.read_odom()
@@ -29,7 +31,11 @@ class RosDataPublisher():
         self.latitude = self.gps_reader.get_gps()[0]
         self.longitude = self.gps_reader.get_gps()[1]
         self.yaw = self.gps_reader.get_gps()[2]
-        self.velocity = self.odometry_reader.get_vel()
+        
+        if self.velocity_source == 'Odometry':
+            self.velocity = self.odometry_reader.get_vel() ## here
+        if self.velocity_source == 'GPS':
+            self.velocity = self.gps_reader.get_vel()
 
     def data_compose(self) -> None:
 
